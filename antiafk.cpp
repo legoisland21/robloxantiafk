@@ -64,7 +64,7 @@ int main() {
             // Check hotkey messages
             while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
                 if (msg.message == WM_HOTKEY) {
-                    cout << "Alt+Q pressed, exiting antiafk.exe 🗿🔥\n";
+                    cout << "Alt+Q pressed, exiting antiafk.exe\n";
                     return 0;
                 }
             }
