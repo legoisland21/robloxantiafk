@@ -1,7 +1,9 @@
 #include "autocontroller.h"
 #include <iostream>
 #include <random>
+#include <windows.h>
 using namespace std;
+
 random_device dev;
 mt19937 rng(dev());
 int payload, time_hold, delay;
@@ -39,6 +41,11 @@ void strokeKey(WORD character, int delay) {
 }
 
 int main() {
+    if (!RegisterHotKey(NULL, 1, MOD_ALT, 0x51)) { // Alt+Q
+        cerr << "Failed to register hotkey.\n";
+        return 1;
+    }
+
     HWND hwnd = FindWindowA(NULL, "Roblox");
     if(hwnd) {
         cout << "Enter delay: ";
@@ -51,10 +58,23 @@ int main() {
         cout << "Focusing Roblox" << endl;
         SetFocus(hwnd);
         centerCursorInWindow(hwnd);
+
+        MSG msg = {0};
         while(true) {
+            // Check hotkey messages
+            while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                if (msg.message == WM_HOTKEY) {
+                    cout << "Alt+Q pressed, exiting antiafk.exe 🗿🔥\n";
+                    return 0;
+                }
+            }
+
             uniform_int_distribution<mt19937::result_type> payload_random(0,6);
             payload = payload_random(rng);
-            if(payload > 0 && payload < 4) { uniform_int_distribution<mt19937::result_type> random_delay(5,500); time_hold = random_delay(rng); }
+            if(payload > 0 && payload < 4) { 
+                uniform_int_distribution<mt19937::result_type> random_delay(5,500); 
+                time_hold = random_delay(rng); 
+            }
             if(payload == 0) strokeKey('W', time_hold);
             else if(payload == 1) strokeKey('A', time_hold);
             else if(payload == 2) strokeKey('S', time_hold);
@@ -62,6 +82,7 @@ int main() {
             else if(payload == 4) strokeKey(VK_SPACE, time_hold);
             else if(payload == 5) control.scrollVertical(3);
             else if(payload == 6) control.scrollVertical(-3);
+
             Sleep(delay);
         }
     } else {
@@ -69,4 +90,4 @@ int main() {
         return 1;
     }
     return 0;
-} 
+}
